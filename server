@@ -1,0 +1,87 @@
+#!/bin/bash
+red='\033[0;31m'
+empt='\033[0m'
+perp='\033[0;35m'
+cyan='\033[0;36m'
+clear
+function logo
+{
+echo -e "${red}
+   ____
+  / ___|  ___ _ ____   _____ _ __
+ ${perp} \___ \ / _ \ '__\ \ / / _ \ '__|
+ ${cyan}  ___) |  __/ |   \ V /  __/ |${empt}
+  |____/ \___|_|    \_/ \___|_|
+  
+"
+}
+function get
+    {
+        clear
+        logo
+        read -p "  Enter your root path:(default is storage/server)" path
+        if [ "$path" == '' ]
+            then
+                mkdir "/storage/emulated/0/server" > /dev/null
+                path='/storage/emulated/0/server'
+        fi
+        while [ ! -d "$path" ];do
+            read -p "  Invlid path, please try again: " path
+        done
+        cp index.html logo.png "$path"
+        clear
+        logo
+        echo $port
+        read -p "  Enter your port:(default is 8080) " port
+            until [[ $port =~ ^[0-9]+$ ]];do
+                if [ "$port" == '' ]
+                    then
+                        port="8080"
+                        break
+                    else
+                        read -n 5 -p " `echo -e '\n'` invalid port,please try again:(must have a 4 digits) " port
+                fi
+            done
+        adress="localhost:$port"
+        php -S "$adress" -t "$path"
+    }
+logo
+echo -e "  ${red}1.start php server"
+echo -e "  ${red}2.connect server to internet"
+echo -e "\n"
+read -p "  >>  " num
+if [ "$num" == "1" ]
+	then
+		get
+	elif [ "$num" == "2" ]
+		then
+				clear
+			        logo
+			        read -p "  Enter your root path:(default is storage/server)" path
+			        if [ "$path" == '' ]
+			            then
+			                mkdir "/storage/emulated/0/server" > /dev/null
+			                path='/storage/emulated/0/server'
+			        fi
+			        while [ ! -d "$path" ];do
+			            read -p "  Invlid path, please try again: " path
+			        done
+			        mv index.html logo.png "$path"
+			        clear
+			        logo
+			        echo $port
+			        read -p "  Enter your port:(default is 8080) " port
+			            until [[ $port =~ ^[0-9]+$ ]];do
+			                if [ "$port" == '' ]
+			                    then
+			                        port="8080"
+			                        break
+			                    else
+			                        read -n 5 -p " `echo -e '\n'` invalid port,please try again:(must have a 4 digits) " port
+			                fi
+			            done
+			        adress="localhost:$port"
+			        php -S "$adress" -t "$path" &> /dev/null &
+			        ssh -R "80:$adress" ssh.localhost.run 
+			        
+fi
